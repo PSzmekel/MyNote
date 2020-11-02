@@ -115,4 +115,4 @@ STATIC_URL = '/static/'
 
 
 # Custom User
-AUTH_USER_MODEL = 'myapp.CustomUser'
+AUTH_USER_MODEL = 'accounts.CustomUser'
