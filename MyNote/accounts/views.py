@@ -1,8 +1,7 @@
-from django.contrib.auth.models import User
-from accounts.models import CustomUser
 from rest_framework import viewsets
 from rest_framework import permissions
-from accounts.serializers import CustomUserSerializer
+from MyNote.accounts.serializers import CustomUserSerializer
+from MyNote.accounts.models import CustomUser
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):

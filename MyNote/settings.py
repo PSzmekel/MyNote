@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',  # REST Framework
-    'accounts',  # Custom User
+    'MyNote.accounts',  # Custom User
 ]
 
 MIDDLEWARE = [

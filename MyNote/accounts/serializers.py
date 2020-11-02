@@ -1,5 +1,4 @@
-from django.contrib.auth.models import User, Group
-from accounts.models import CustomUser
+from MyNote.accounts.models import CustomUser
 from rest_framework import serializers
 
 
