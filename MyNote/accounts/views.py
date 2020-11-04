@@ -11,3 +11,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all().order_by('-date_joined')
     serializer_class = CustomUserSerializer
     #permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        users = CustomUser.objects.filter(is_staff=False, is_active=True)
+        return users
