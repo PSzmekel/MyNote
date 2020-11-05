@@ -1,3 +1,5 @@
+import django
+import os
 from pathlib import Path
 
 import environ
