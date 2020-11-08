@@ -39,30 +39,6 @@ def test_user_create_pass_not_ok():
         'lennon@thebeatles.com', 'johnpassword')
     assert user.check_password('johnpassworda') == False
 
-# Super User
-
-
-@pytest.mark.django_db
-def test_superuser_create():
-    superuser = CustomUser.objects.create_superuser(
-        'lennon@thebeatles.com', 'johnpassword')
-    superuser2 = CustomUser.objects.create_superuser(
-        'lennon2@thebeatles.com', 'johnpassword')
-    assert superuser.is_staff == True and superuser2.is_staff == True
-
-
-@pytest.mark.django_db
-def test_superuser_create_unique():
-    is_unique = True
-    try:
-        superuser = CustomUser.objects.create_superuser(
-            'lennon@thebeatles.com', 'johnpassword')
-        superuser2 = CustomUser.objects.create_superuser(
-            'lennon@thebeatles.com', 'johnpassword')
-    except(IntegrityError):
-        is_unique = False
-    assert is_unique == False
-
 # API
 
 
@@ -76,21 +52,30 @@ def test_get_users():
 
 
 @pytest.mark.django_db
-def test_get_superuser():
-    CustomUser.objects.create_superuser(
-        'lennon@thebeatles.com', 'johnpassword')
-    client = APIClient()
-    response = client.get('/api/users/')
-    assert response.data == []  # can't get superuser by api, dataset shoudl be empty
-
-
-@pytest.mark.django_db
 def test_post_user():
     client = APIClient()
     response = client.post(
         '/api/users/', {'email': 'test@mail.com', 'password': 'password'})
     assert response.status_code == 201
     assert CustomUser.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_post_user_bad1():
+    client = APIClient()
+    response = client.post(
+        '/api/users/', {'email': 'test@mail.com'})
+    assert response.status_code == 400
+    assert CustomUser.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_post_user_bad1():
+    client = APIClient()
+    response = client.post(
+        '/api/users/', {'password': 'password'})
+    assert response.status_code == 400
+    assert CustomUser.objects.count() == 0
 
 
 @pytest.mark.django_db
@@ -103,6 +88,7 @@ def test_put_user():
     assert response.status_code == 200
     user.refresh_from_db()
     assert user.email == 'test1@mail.com'
+    assert user.check_password('password1') == True
 
 
 @pytest.mark.django_db
