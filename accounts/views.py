@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import permissions
-from MyNote.accounts.serializers import CustomUserSerializer
-from MyNote.accounts.models import CustomUser
+from accounts.serializers import CustomUserSerializer
+from accounts.models import CustomUser
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):

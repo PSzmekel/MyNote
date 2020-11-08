@@ -1,4 +1,4 @@
-from MyNote.accounts.models import CustomUser
+from accounts.models import CustomUser
 from rest_framework import serializers
 
 

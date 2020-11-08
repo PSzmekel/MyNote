@@ -2,7 +2,7 @@ import pytest
 
 from django.db.utils import IntegrityError
 
-from MyNote.accounts.models import CustomUser
+from accounts.models import CustomUser
 
 
 @pytest.mark.django_db
