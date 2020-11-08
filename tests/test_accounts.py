@@ -88,7 +88,7 @@ def test_put_user():
     assert response.status_code == 200
     user.refresh_from_db()
     assert user.email == 'test1@mail.com'
-    assert user.check_password('password1') == True
+    assert user.check_password('johnpassword') == True
 
 
 @pytest.mark.django_db

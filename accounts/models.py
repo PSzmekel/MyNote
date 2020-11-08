@@ -1,8 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
+from django.db.models.signals import post_save
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from django.dispatch import receiver
 
 
 class CustomUserManager(BaseUserManager):
@@ -28,3 +31,9 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['password']
 
     objects = CustomUserManager()
+
+
+@receiver(post_save, sender=CustomUser)
+def create_auth_thoken(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
