@@ -1,3 +1,4 @@
+from django.db.utils import IntegrityError
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import viewsets, status
 from accounts.serializers import CustomUserSerializer
@@ -24,6 +25,9 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 email=user_data['email'], password=user_data['password'])
         except MultiValueDictKeyError as e:
             content = {'Value is required': str(e)}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError as e:
+            content = {'Value error': 'email exists in system'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         user.save()
         serializer = CustomUserSerializer(

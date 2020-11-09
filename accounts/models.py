@@ -1,11 +1,12 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
+from django.db.utils import IntegrityError
 from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from django.dispatch import receiver
 
 
 class CustomUserManager(BaseUserManager):
@@ -14,10 +15,13 @@ class CustomUserManager(BaseUserManager):
     for authentication instead of usernames.
     """
 
-    def create_user(self, email=None, password=None):
-        user = self.model(
-            email=self.normalize_email(email)
-        )
+    def create_user(self, email, password):
+        try:
+            user = self.model(
+                email=self.normalize_email(email)
+            )
+        except IntegrityError as e:
+            raise IntegrityError
         user.set_password(password)
         user.save(using=self._db)
         return user

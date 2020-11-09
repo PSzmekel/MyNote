@@ -2,8 +2,10 @@ import pytest
 
 from django.db.utils import IntegrityError
 from rest_framework.test import APIClient
+from rest_framework.authtoken.models import Token
 
 from accounts.models import CustomUser
+
 
 # User
 
@@ -61,6 +63,16 @@ def test_post_user():
 
 
 @pytest.mark.django_db
+def test_post_user_uniqe():
+    user = CustomUser.objects.create_user(
+        'lennon@thebeatles.com', 'johnpassword')
+    client = APIClient()
+    response = client.post(
+        '/api/users/', {'email': 'lennon@thebeatles.com', 'password': 'johnpassword'})
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
 def test_post_user_bad1():
     client = APIClient()
     response = client.post(
@@ -70,7 +82,7 @@ def test_post_user_bad1():
 
 
 @pytest.mark.django_db
-def test_post_user_bad1():
+def test_post_user_bad2():
     client = APIClient()
     response = client.post(
         '/api/users/', {'password': 'password'})
@@ -99,3 +111,12 @@ def test_delete_user():
     response = client.delete('/api/users/' + str(user.id) + '/')
     assert response.status_code == 204
     assert CustomUser.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_auto_token():
+    client = APIClient()
+    response = client.post(
+        '/api/users/', {'email': 'test@mail.com', 'password': 'password'})
+    assert response.status_code == 201
+    assert Token.objects.count() == 1
