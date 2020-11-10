@@ -123,5 +123,11 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
-
 )
+
+# Permissions
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        env('DEFAULT_PERMISSION_CLASSES'),
+    ]
+}

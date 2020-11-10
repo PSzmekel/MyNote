@@ -1,6 +1,8 @@
 from django.db.utils import IntegrityError
 from django.utils.datastructures import MultiValueDictKeyError
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
 from accounts.serializers import CustomUserSerializer
 from accounts.models import CustomUser
 from rest_framework.response import Response
@@ -12,10 +14,14 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     """
     queryset = CustomUser.objects.all().order_by('-date_joined')
     serializer_class = CustomUserSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
-        users = CustomUser.objects.filter(is_staff=False, is_active=True)
+        tokenString = self.request.headers.get('Authorization').split(' ')[1]
+        token = Token.objects.get(key=tokenString)
+        users = CustomUser.objects.filter(
+            is_staff=False, is_active=True, id=token.user.id)
         return users
 
     def create(self, request, *args, **kwargs):
