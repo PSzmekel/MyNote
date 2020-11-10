@@ -2,6 +2,7 @@ from django.db.utils import IntegrityError
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import viewsets, status, permissions
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.authtoken.models import Token
 from accounts.serializers import CustomUserSerializer
 from accounts.models import CustomUser
@@ -14,7 +15,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     """
     queryset = CustomUser.objects.all().order_by('-date_joined')
     serializer_class = CustomUserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes_by_action = {'create': [permissions.AllowAny],
+                                    'list': [permissions.IsAuthenticated]}
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
@@ -39,3 +41,11 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         serializer = CustomUserSerializer(
             user, many=False, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def get_permissions(self):
+        try:
+            # return permission_classes depending on `action`
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            # action is not set return default permission_classes
+            return [permission() for permission in self.permission_classes]
