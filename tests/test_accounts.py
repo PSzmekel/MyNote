@@ -46,9 +46,13 @@ def test_user_create_pass_not_ok():
 
 @pytest.mark.django_db
 def test_get_users():
-    CustomUser.objects.create_user('lennon@thebeatles.com', 'johnpassword')
+    user = CustomUser.objects.create_user(
+        'lennon@thebeatles.com', 'johnpassword')
+    token = Token.objects.get(user=user)
     client = APIClient()
-    response = client.get('/api/users/')
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+    response = client.get(
+        '/api/users/')
     assert response.status_code == 200
     assert response.data != []
 
@@ -94,7 +98,9 @@ def test_post_user_bad2():
 def test_put_user():
     user = CustomUser.objects.create_user(
         'lennon@thebeatles.com', 'johnpassword')
+    token = Token.objects.get(user=user)
     client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
     response = client.put(
         '/api/users/' + str(user.id) + '/', {'email': 'test1@mail.com', 'password': 'password1'})
     assert response.status_code == 200
@@ -107,7 +113,9 @@ def test_put_user():
 def test_delete_user():
     user = CustomUser.objects.create_user(
         'lennon@thebeatles.com', 'johnpassword')
+    token = Token.objects.get(user=user)
     client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
     response = client.delete('/api/users/' + str(user.id) + '/')
     assert response.status_code == 204
     assert CustomUser.objects.count() == 0
