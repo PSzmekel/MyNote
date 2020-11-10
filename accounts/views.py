@@ -16,7 +16,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all().order_by('-date_joined')
     serializer_class = CustomUserSerializer
     permission_classes_by_action = {'create': [permissions.AllowAny],
-                                    'list': [permissions.IsAuthenticated]}
+                                    'list': [permissions.IsAuthenticated],
+                                    'destroy': [permissions.IsAuthenticated]}
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
@@ -41,6 +42,16 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         serializer = CustomUserSerializer(
             user, many=False, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
+        tokenString = self.request.headers.get('Authorization').split(' ')[1]
+        token = Token.objects.get(key=tokenString)
+        instance = self.get_object()
+        if instance.id == token.user.id:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_permissions(self):
         try:
