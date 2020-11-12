@@ -18,7 +18,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     permission_classes_by_action = {'create': [permissions.AllowAny],
                                     'list': [permissions.IsAuthenticated],
                                     'destroy': [permissions.IsAuthenticated],
-                                    'update': [permissions.IsAuthenticated]}
+                                    'update': [permissions.IsAuthenticated],
+                                    'retrieve': [permissions.IsAuthenticated]}
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):

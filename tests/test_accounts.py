@@ -58,6 +58,21 @@ def test_get_users():
 
 
 @pytest.mark.django_db
+def test_get_user():
+    user1 = CustomUser.objects.create_user(
+        'lennon1@thebeatles.com', 'johnpassword')
+    user2 = CustomUser.objects.create_user(
+        'lennon@thebeatles.com', 'johnpassword')
+    token = Token.objects.get(user=user2)
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+    response = client.get(
+        '/api/users/' + str(user1.id) + '/')
+    assert response.status_code == 404
+    assert response.data != []
+
+
+@pytest.mark.django_db
 def test_post_user():
     client = APIClient()
     response = client.post(
@@ -106,6 +121,7 @@ def test_put_user():
     assert response.status_code == 200
     user.refresh_from_db()
     assert user.email == 'test1@mail.com'
+    # this method don't change password
     assert user.check_password('johnpassword') == True
 
 
