@@ -144,3 +144,44 @@ def test_auto_token():
         '/api/users/', {'email': 'test@mail.com', 'password': 'password'})
     assert response.status_code == 201
     assert Token.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_change_password():
+    user = CustomUser.objects.create_user(
+        'lennon@thebeatles.com', 'johnpassword')
+    token = Token.objects.get(user=user)
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+    response = client.put(
+        '/api/users/' + str(user.id) + '/changepass/', {'password_old': 'johnpassword', 'password': 'password'})
+    assert response.status_code == 202
+    assert user.check_password('password') == True
+
+
+@pytest.mark.django_db
+def test_change_password():
+    user = CustomUser.objects.create_user(
+        'lennon@thebeatles.com', 'johnpassword')
+    token = Token.objects.get(user=user)
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+    response = client.put(
+        '/api/users/' + str(user.id) + '/changepass/', {'password_old': 'johnpassword1', 'password': 'password'})
+    assert response.status_code == 202
+    assert user.check_password('password') == True
+
+
+@pytest.mark.django_db
+def test_change_password():
+    user = CustomUser.objects.create_user(
+        'lennon@thebeatles.com', 'johnpassword')
+    token = Token.objects.get(user=user)
+    user2 = CustomUser.objects.create_user(
+        'lennon1@thebeatles.com', 'johnpassword')
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+    response = client.put(
+        '/api/users/' + str(user2.id) + '/changepass/', {'password_old': 'johnpassword1', 'password': 'password'})
+    assert response.status_code == 405
+    assert user.check_password('johnpassword') == True

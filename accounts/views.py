@@ -1,8 +1,9 @@
+from os import stat
 from django.db.utils import IntegrityError
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import viewsets, status, permissions
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import action, permission_classes, authentication_classes
 from rest_framework.authtoken.models import Token
 from accounts.serializers import CustomUserSerializer
 from accounts.models import CustomUser
@@ -19,7 +20,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                                     'list': [permissions.IsAuthenticated],
                                     'destroy': [permissions.IsAuthenticated],
                                     'update': [permissions.IsAuthenticated],
-                                    'retrieve': [permissions.IsAuthenticated]}
+                                    'retrieve': [permissions.IsAuthenticated],
+                                    'changepass': [permissions.IsAuthenticated]}
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
@@ -74,6 +76,23 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+    @action(detail=True, methods=['put'])
+    @permission_classes(permissions.IsAuthenticated)
+    def changepass(self, request, *args, **kwargs):
+        user_data = request.data
+        tokenString = self.request.headers.get('Authorization').split(' ')[1]
+        token = Token.objects.get(key=tokenString)
+        user = CustomUser.objects.get(id=token.user.id)
+        oldPassword = user_data['password_old']
+        newPassword = user_data['password']
+        if user.check_password(oldPassword):
+            user.set_password(newPassword)
+            serializer = CustomUserSerializer(
+                user, many=False, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def get_permissions(self):
         try:
