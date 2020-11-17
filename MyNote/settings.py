@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework',  # REST Framework
     'accounts',  # Custom User
+    'notes',  # Notes app
 ]
 
 MIDDLEWARE = [

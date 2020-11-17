@@ -78,7 +78,6 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=True, methods=['put'])
-    @permission_classes(permissions.IsAuthenticated)
     def changepass(self, request, *args, **kwargs):
         user_data = request.data
         tokenString = self.request.headers.get('Authorization').split(' ')[1]
