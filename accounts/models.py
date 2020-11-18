@@ -43,8 +43,10 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+    id = models.AutoField(primary_key=True)
     username = None
-    email = models.EmailField(_('email address'), unique=True)
+    email = models.EmailField(
+        _('email address'), unique=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['password']

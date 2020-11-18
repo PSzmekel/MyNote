@@ -9,7 +9,7 @@ from string import ascii_lowercase
 
 class Note(models.Model):
     id = models.CharField(primary_key=True, unique=True, max_length=8)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='notes',
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='notes', to_field='email',
                               on_delete=models.CASCADE)
     topic = models.CharField(max_length=30)
     text = models.TextField(max_length=4092, blank=True, null=True)
