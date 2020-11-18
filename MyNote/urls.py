@@ -12,5 +12,4 @@ urlpatterns = [
     path('api/', include(accountsUrls)),
     path('api/', include(notesUrls)),
     path('auth/', obtain_auth_token)
-
 ]

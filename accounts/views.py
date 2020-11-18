@@ -2,6 +2,7 @@ from os import stat
 from django.db.utils import IntegrityError
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import viewsets, status, permissions
+from rest_framework import serializers
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action, permission_classes, authentication_classes
 from rest_framework.authtoken.models import Token
