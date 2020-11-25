@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from notes.models import Note
+
+
+class NoteAdmin(admin.ModelAdmin):
+    fields = ['id', 'owner', 'topic', 'text']
+
+
+admin.site.register(Note, NoteAdmin)

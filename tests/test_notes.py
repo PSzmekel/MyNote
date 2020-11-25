@@ -23,7 +23,7 @@ def test_note_create():
 
 
 @pytest.mark.django_db
-@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_note_create_bad_mail():
     CustomUser.objects.create_user(
         'bim@thebeatles.com', 'johnpassword')
@@ -34,7 +34,7 @@ def test_note_create_bad_mail():
     client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
     response = client.post(
         '/api/notes/', {'topic': 'topic1', 'text': 'text1', 'owner': 'bim@thebeatles.com'})
-    assert response.status_code == 403
+    assert response.status_code == 401
     assert Note.objects.count() == 0
 
 
@@ -54,7 +54,6 @@ def test_get():
 
 
 @pytest.mark.django_db
-@pytest.mark.xfail
 def test_get_another_users_note():
     user1 = CustomUser.objects.create_user(
         'lennon@thebeatles.com', 'johnpassword')
@@ -71,11 +70,10 @@ def test_get_another_users_note():
     client2.credentials(HTTP_AUTHORIZATION='Token ' + token2.key)
     response = client2.get(
         '/api/notes/' + noteId + '/')
-    assert response.status_code == 401
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
-@pytest.mark.xfail
 def test_delete():
     user = CustomUser.objects.create_user(
         'lennon@thebeatles.com', 'johnpassword')
@@ -87,12 +85,11 @@ def test_delete():
     noteId = Note.objects.get(topic='topic1').id
     response = client.delete(
         '/api/notes/' + noteId + '/')
-    assert response.status_code == 200
+    assert response.status_code == 204
     assert Note.objects.count() == 0
 
 
 @pytest.mark.django_db
-@pytest.mark.xfail
 def test_delete_another_users_note():
     user1 = CustomUser.objects.create_user(
         'lennon@thebeatles.com', 'johnpassword')
@@ -109,7 +106,7 @@ def test_delete_another_users_note():
     client2.credentials(HTTP_AUTHORIZATION='Token ' + token2.key)
     response = client2.delete(
         '/api/notes/' + noteId + '/')
-    assert response.status_code == 401
+    assert response.status_code == 404
     assert Note.objects.count() == 1
 
 
