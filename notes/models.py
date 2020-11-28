@@ -5,6 +5,7 @@ from django.db import IntegrityError
 
 from random import choice
 from string import ascii_lowercase
+from django.utils import timezone
 
 
 class Note(models.Model):
@@ -14,7 +15,12 @@ class Note(models.Model):
     topic = models.CharField(max_length=30)
     text = models.TextField(max_length=4092, blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True, editable=False)
-    last_edit = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_edit = models.DateTimeField(blank=True, null=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__topic = self.topic
+        self.__text = self.text
 
     def save(self, *args, **kwargs):
         def _get_random_string(length):
@@ -25,6 +31,8 @@ class Note(models.Model):
         if not self.id:
             self.id = _get_random_string(8)
             # using your function as above or anything else
+        if self.__topic != self.topic or self.__text != self.text:
+            self.last_edit = timezone.now()
         success = False
         failures = 0
         while not success:

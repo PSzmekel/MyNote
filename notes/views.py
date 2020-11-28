@@ -1,12 +1,9 @@
-from django.contrib.auth.models import User
-from django.db.utils import IntegrityError
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import viewsets, permissions, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
-from notes.serializers import NoteSerializer
+from notes.serializers import NoteSerializer, NoteUpdateSerializer
 from notes.models import Note
 from accounts.models import CustomUser
 
@@ -23,6 +20,12 @@ class NoteViewSet(viewsets.ModelViewSet):
                                     'update': [permissions.IsAuthenticated],
                                     'retrieve': [permissions.IsAuthenticated]}
     authentication_classes = (TokenAuthentication,)
+
+    def get_serializer_class(self):
+        serializer_class = self.serializer_class
+        if self.request.method == 'PUT':
+            serializer_class = NoteUpdateSerializer
+        return serializer_class
 
     def get_queryset(self):
         tokenString = self.request.headers.get('Authorization').split(' ')[1]

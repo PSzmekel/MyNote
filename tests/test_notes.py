@@ -111,36 +111,38 @@ def test_delete_another_users_note():
 
 
 @pytest.mark.django_db
-@pytest.mark.xfail
 def test_note_edit():
     user = CustomUser.objects.create_user(
         'lennon@thebeatles.com', 'johnpassword')
     token = Token.objects.get(user=user)
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-    client.post(
+    response1 = client.post(
         '/api/notes/', {'topic': 'topic1', 'text': 'text1', 'owner': 'lennon@thebeatles.com'})
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+    print(response1.data['id'])
     response = client.put(
-        '/api/notes/', {'topic': 'topic2', 'text': 'text2'})
+        '/api/notes/' + response1.data['id'] + '/', {'topic': 'topic2', 'text': 'text2'})
     note = Note.objects.get(topic='topic2')
-    assert response.status_code == 202
+    assert response.status_code == 200
     assert note.created_date != note.last_edit
     assert note.topic == 'topic2'
     assert note.text == 'text2'
 
 
 @pytest.mark.django_db
-@pytest.mark.xfail
 def test_note_edit_not_change():
     user = CustomUser.objects.create_user(
         'lennon@thebeatles.com', 'johnpassword')
     token = Token.objects.get(user=user)
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-    client.post(
+    response1 = client.post(
         '/api/notes/', {'topic': 'topic1', 'text': 'text1', 'owner': 'lennon@thebeatles.com'})
+    client.put(
+        '/api/notes/' + response1.data['id'] + '/', {'topic': 'topic1', 'text': 'text1'})
     response = client.put(
-        '/api/notes/', {'topic': 'topic1', 'text': 'text1'})
+        '/api/notes/' + response1.data['id'] + '/', {'topic': 'topic1', 'text': 'text1'})
     note = Note.objects.get(topic='topic1')
-    assert response.status_code == 202
-    assert note.created_date == note.last_edit
+    assert response.status_code == 200
+    assert None == note.last_edit
